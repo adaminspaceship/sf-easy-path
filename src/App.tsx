@@ -21,6 +21,29 @@ const hasValidKey = Boolean(API_KEY) && API_KEY !== 'YOUR_API_KEY';
 export default function App() {
   const [selectedRouteIndex, setSelectedRouteIndex] = useState<number>(0);
   const [routes, setRoutes] = useState<any[]>([]);
+  const [bottomOffset, setBottomOffset] = useState(0);
+
+  useEffect(() => {
+    if (!window.visualViewport) return;
+
+    const handleResize = () => {
+      if (window.visualViewport) {
+        // Calculate the difference between normal height and visual viewport height
+        // This gives us the keyboard height basically
+        const offset = window.innerHeight - window.visualViewport.height;
+        // On mobile, if there's a significant offset (>50px), it's likely the keyboard
+        setBottomOffset(offset > 50 ? offset : 0);
+      }
+    };
+
+    window.visualViewport.addEventListener('resize', handleResize);
+    window.visualViewport.addEventListener('scroll', handleResize);
+
+    return () => {
+      window.visualViewport?.removeEventListener('resize', handleResize);
+      window.visualViewport?.removeEventListener('scroll', handleResize);
+    };
+  }, []);
 
   if (!hasValidKey) {
     return (
@@ -44,7 +67,7 @@ export default function App() {
 
   return (
     <APIProvider apiKey={API_KEY} version="quarterly" libraries={['places', 'geometry', 'routes']}>
-      <div className="relative h-[100dvh] w-full bg-gray-100 overflow-hidden font-sans">
+      <div className="relative h-[100dvh] w-full bg-[#F9F5EC] overflow-hidden font-sans text-[#162635]">
         
         {/* Map Background */}
         <div className="absolute inset-0 z-0">
@@ -55,7 +78,10 @@ export default function App() {
         </div>
 
         {/* Floating UI Overlay */}
-        <div className="absolute inset-x-0 bottom-0 pointer-events-none z-10 flex flex-col items-center pb-0 md:pb-6 md:items-start md:pl-6">
+        <div 
+          className="absolute inset-x-0 bottom-0 pointer-events-none z-10 flex flex-col items-center md:items-start md:pl-6 transition-transform duration-200 ease-out pb-0 md:pb-6"
+          style={{ transform: `translateY(-${bottomOffset}px)` }}
+        >
           <div className="pointer-events-auto w-full md:w-[400px]">
             <RouteSidebar 
               isOpen={true} 

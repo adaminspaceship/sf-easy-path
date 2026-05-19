@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useMapsLibrary, useMap } from '@vis.gl/react-google-maps';
-import { Search, Navigation2, MapPin, Loader2, ArrowRight, TrendingUp, Clock, MoveRight, ChevronDown, ChevronUp, Info, Activity, X, Sparkles } from 'lucide-react';
+import { Search, Navigation2, MapPin, Loader2, ArrowRight, TrendingUp, Clock, MoveRight, ChevronDown, ChevronUp, Info, Activity, X } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { ElevationProfile } from './ElevationProfile';
 
@@ -24,8 +24,6 @@ export function RouteSidebar({
   const [currentLocation, setCurrentLocation] = useState<{lat: number, lng: number} | null>(null);
   const [destination, setDestination] = useState('');
   const [isSearching, setIsSearching] = useState(false);
-  const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
-  const [isAnalyzingAi, setIsAnalyzingAi] = useState(false);
   
   const map = useMap();
   const routesLib = useMapsLibrary('routes');
@@ -71,7 +69,7 @@ export function RouteSidebar({
       const destInput = document.createElement('input');
       destInput.type = 'text';
       destInput.placeholder = 'Where to?';
-      destInput.className = "w-full pl-8 pr-4 py-3 bg-gray-50 border border-transparent rounded-xl transition-all focus:bg-white focus:border-blue-500 outline-none text-sm text-gray-900";
+      destInput.className = "w-full pl-8 pr-4 py-3 bg-gray-50 border border-transparent rounded-xl transition-all focus:bg-white focus:border-blue-500 outline-none text-base text-gray-900";
 
       const destAutocomplete = new placesLib.Autocomplete(destInput, {
         bounds: sfBounds,
@@ -159,24 +157,6 @@ export function RouteSidebar({
       onRoutesFound(finalRoutes);
       onSelectRoute(0);
       
-      // Trigger AI Analysis
-      setIsAnalyzingAi(true);
-      try {
-        const response = await fetch('/api/analyze-routes', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ routes: finalRoutes, destination })
-        });
-        const data = await response.json();
-        if (data.analysis) {
-          setAiAnalysis(data.analysis);
-        }
-      } catch (err) {
-        console.error("AI Error:", err);
-      } finally {
-        setIsAnalyzingAi(false);
-      }
-      
     } catch (error) {
       console.error('Error finding routes:', error);
       alert('Error finding routes. Please try again.');
@@ -247,7 +227,6 @@ export function RouteSidebar({
   const handleReset = () => {
     onRoutesFound([]);
     setDestination('');
-    setAiAnalysis(null);
     if (destContainerRef.current) {
       const input = destContainerRef.current.querySelector('input');
       if (input) input.value = '';
@@ -257,13 +236,13 @@ export function RouteSidebar({
   const selectedRoute = routes[selectedRouteIndex];
 
   return (
-    <div className="bg-white md:rounded-3xl rounded-t-3xl shadow-[0_-8px_30px_rgb(0,0,0,0.12)] border-t border-gray-200 md:border-none p-5 relative overflow-hidden transition-all duration-300">
+    <div className="bg-[#F9F5EC] md:rounded-3xl rounded-t-3xl shadow-[0_-8px_30px_rgb(0,0,0,0.12)] border-t border-[#E8DFC8] md:border-none p-5 relative overflow-hidden transition-all duration-300">
       
       {/* SEARCH FORM */}
       <div className={cn("transition-all duration-300", routes.length > 0 ? "hidden" : "block")}>
         <div className="flex items-center gap-2 mb-4">
-          <Navigation2 className="w-6 h-6 text-blue-600 fill-blue-600" />
-          <h2 className="font-bold text-gray-900 text-xl tracking-tight">FlatPath</h2>
+          <Navigation2 className="w-6 h-6 text-[#DE4B28] fill-[#DE4B28]" />
+          <h2 className="font-bold text-[#162635] text-xl tracking-tight">FlatPath</h2>
         </div>
         
         <div className="relative mb-3">
@@ -273,7 +252,7 @@ export function RouteSidebar({
         <button
           onClick={findRoutes}
           disabled={isSearching || !currentLocation || !destination}
-          className="w-full py-3.5 bg-black hover:bg-gray-800 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2 text-lg"
+          className="w-full py-3.5 bg-[#162635] hover:bg-[#1A2D40] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2 text-lg"
         >
           {isSearching ? <Loader2 className="w-5 h-5 animate-spin" /> : <TrendingUp className="w-5 h-5" />}
           {isSearching ? 'Finding routes...' : 'Find Easiest Path'}
@@ -285,34 +264,32 @@ export function RouteSidebar({
         <div className="animate-in fade-in zoom-in-95 duration-200">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <h3 className="font-bold text-gray-900 text-xl flex items-center gap-2">
-                {selectedRouteIndex === 0 ? (routes.length === 1 ? 'Suggested Path' : 'Easiest Path') : 'Hardest Path'}
-                {selectedRouteIndex === 0 && <span className="text-[10px] bg-green-100 text-green-800 px-2 py-0.5 rounded-full uppercase font-bold tracking-wide">Easiest</span>}
-                {selectedRouteIndex === 1 && <span className="text-[10px] bg-red-100 text-red-800 px-2 py-0.5 rounded-full uppercase font-bold tracking-wide">Hardest</span>}
+              <h3 className="font-bold text-[#162635] text-xl flex items-center gap-2">
+                FlatPath Route
               </h3>
-              <p className="text-sm text-gray-500 font-medium mt-1 uppercase tracking-wide">
+              <p className="text-sm text-[#162635]/70 font-medium mt-1 uppercase tracking-wide">
                 {selectedRoute.durationMillis ? Math.round(selectedRoute.durationMillis / 60000) : 0} mins • {((selectedRoute.distanceMeters || 0) * 0.000621371).toFixed(1)} miles
               </p>
             </div>
             <button 
               onClick={handleReset} 
-              className="bg-gray-100 hover:bg-gray-200 p-2 rounded-full transition-colors flex-shrink-0"
+              className="bg-white/50 hover:bg-white p-2 rounded-full transition-colors flex-shrink-0"
             >
-              <X className="w-5 h-5 text-gray-600" />
+              <X className="w-5 h-5 text-[#162635]" />
             </button>
           </div>
 
           <div className="grid grid-cols-2 gap-3 mb-4">
-            <div className="bg-gray-50 p-3.5 rounded-xl border border-gray-100">
-              <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1">Total Climb</p>
-              <p className="font-bold text-gray-900 flex items-baseline gap-1 text-2xl">
-                {selectedRoute.metrics.totalClimb} <span className="text-sm text-gray-500 font-medium">ft</span>
+            <div className="bg-white/60 p-3.5 rounded-xl border border-white/40">
+              <p className="text-[10px] text-[#162635]/50 uppercase font-bold tracking-wider mb-1">Total Climb</p>
+              <p className="font-bold text-[#162635] flex items-baseline gap-1 text-2xl">
+                {selectedRoute.metrics.totalClimb} <span className="text-sm text-[#162635]/60 font-medium">ft</span>
               </p>
             </div>
-            <div className="bg-gray-50 p-3.5 rounded-xl border border-gray-100">
-              <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1">Max Slope</p>
-              <p className="font-bold text-gray-900 flex items-baseline gap-1 text-2xl">
-                {selectedRoute.metrics.maxGradient} <span className="text-sm text-gray-500 font-medium">%</span>
+            <div className="bg-white/60 p-3.5 rounded-xl border border-white/40">
+              <p className="text-[10px] text-[#162635]/50 uppercase font-bold tracking-wider mb-1">Max Slope</p>
+              <p className="font-bold text-[#162635] flex items-baseline gap-1 text-2xl">
+                {selectedRoute.metrics.maxGradient} <span className="text-sm text-[#162635]/60 font-medium">%</span>
               </p>
             </div>
           </div>
@@ -321,10 +298,10 @@ export function RouteSidebar({
             href={`https://www.google.com/maps/dir/?api=1&origin=${currentLocation?.lat},${currentLocation?.lng}&destination=${encodeURIComponent(destination)}&travelmode=walking&dir_action=navigate`}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full flex items-center justify-center gap-2 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-sm"
+            className="w-full flex items-center justify-center gap-2 py-3 bg-[#DE4B28] hover:bg-[#c64020] text-white font-bold rounded-xl transition-all shadow-sm"
           >
-            <MapPin className="w-5 h-5" />
-            Export to Google Maps
+            <MapPin className="w-5 h-5 stroke-2" />
+            Export easiest path to Google Maps
           </a>
         </div>
       )}

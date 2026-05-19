@@ -40,7 +40,7 @@ export function MapComponent({ routes, selectedRouteIndex }: MapComponentProps) 
         const polyline = new google.maps.Polyline({
           path: decodedPath,
           geodesic: true,
-          strokeColor: '#2563eb', // blue-600
+          strokeColor: '#DE4B28', // Brand Orange
           strokeOpacity: 1.0,
           strokeWeight: 6,
           map: map
@@ -69,10 +69,10 @@ export function MapComponent({ routes, selectedRouteIndex }: MapComponentProps) 
       {routes[selectedRouteIndex] && (
         <>
           <AdvancedMarker position={routes[selectedRouteIndex].origin}>
-             <Pin background="#10b981" glyphColor="#fff" />
+             <Pin background="#162635" borderColor="#162635" glyphColor="#fff" />
           </AdvancedMarker>
           <AdvancedMarker position={routes[selectedRouteIndex].destination}>
-             <Pin background="#ef4444" glyphColor="#fff" />
+             <Pin background="#DE4B28" borderColor="#DE4B28" glyphColor="#fff" />
           </AdvancedMarker>
         </>
       )}
