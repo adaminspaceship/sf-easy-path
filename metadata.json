@@ -1,0 +1,10 @@
+{
+  "name": "SF FlatPath",
+  "description": "Navigation for San Francisco that optimizes for easiest routes by elevation, avoiding steep hills.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
